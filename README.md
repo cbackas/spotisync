@@ -4,6 +4,6 @@ Simple little script to make sure any song I add to a certain spotify playlist a
 
 
 ### Deployed using docker: 
-Has port passed through so it can briefly spin up a web server for oauth and volume for giving cached token persistant storage
+Has port passed through so it can briefly spin up a web server for oauth and volume for giving cached token persistent storage
 
 docker run -d -p 8100:8100 -v /config:/local/path/to/token/cache -e "SPOTIPY_CLIENT_ID=client_id" -e "SPOTIPY_CLIENT_SECRET=client_secret" -e "SPOTIPY_REDIRECT_URI=redirect_uri" cbackas/spotisync:latest
