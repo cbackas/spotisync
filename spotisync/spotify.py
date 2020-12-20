@@ -1,5 +1,6 @@
 import time, datetime
 from requests import RequestException
+from urllib3.exceptions import MaxRetryError
 
 # have to deal with paginated track lists cuz playlists be big
 # https://stackoverflow.com/questions/39086287/spotipy-how-to-read-more-than-100-tracks-from-a-playlist
@@ -12,6 +13,9 @@ def get_playlist_tracks(sp, playlist_id: str):
             tracks.extend(results['items'])
         return tracks
     except RequestException as e:
+        print(f'[ERROR] Caught exception while getting playlist tracks: {e}')
+        return None
+    except MaxRetryError as e:
         print(f'[ERROR] Caught exception while getting playlist tracks: {e}')
         return None
 
@@ -40,3 +44,6 @@ def perform_sync(sp):
                 print(f'[{current_time}] Synced tracks: {track_names_to_sync}')
             except RequestException as e:
                 print(f'[ERROR] Caught exception while syncing tracks: {e}')
+            except MaxRetryError as e:
+                print(f'[ERROR] Caught exception while syncing tracks: {e}')
+                
