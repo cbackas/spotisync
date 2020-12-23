@@ -30,18 +30,15 @@ def perform_sync(sp):
         # list of all track IDs in jam
         tracks_jam = [item['track']['id'] for item in items_jam]
         # all tracks that are in jelly but not tracks_jam
-        # have it in dict form so i can log song names upon syncing
+        # dict of id:name so i can also print names
         unsynced_tracks = {item['track']['id']:item['track']['name'] for item in items_jelly if item['track']['id'] not in tracks_jam}
 
         # add jelly songs not in jams to jams
         if len(unsynced_tracks) >= 1:
             try:
-                track_ids_to_sync = [key for key in unsynced_tracks.keys()]
-                track_names_to_sync = [value for value in unsynced_tracks.values()]
+                sp.playlist_add_items(playlist_id='3KAGyeFZK1uDfet9hOd6gU', items=list(unsynced_tracks.keys()))
 
-                sp.playlist_add_items(playlist_id='3KAGyeFZK1uDfet9hOd6gU', items=track_ids_to_sync)
-                
-                print(f'[{current_time}] Synced tracks: {track_names_to_sync}')
+                print(f'[{current_time}] Synced tracks: {list(unsynced_tracks.values())}')
             except RequestException as e:
                 print(f'[ERROR] Caught exception while syncing tracks: {e}')
             except MaxRetryError as e:
