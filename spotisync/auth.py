@@ -1,5 +1,6 @@
 import threading, os
 from http.server import HTTPServer, SimpleHTTPRequestHandler
+from core import current_timestamp
 import spotipy
 
 code = None
@@ -17,6 +18,7 @@ class MyRequestHandler(SimpleHTTPRequestHandler):
     def do_GET(self):
         self._set_headers()
         if self.path.startswith('/callback?code='):
+            print(f'[{current_timestamp()}] Callback recieved')
             self.wfile.write(self._html("Thanks for the callback. You can close this tab now."))
             # update code global var so we can get access token using it once server is killed
             global code
@@ -39,13 +41,13 @@ def authenticate():
 
         # spin up a BLOCKING web server that uses MyRequestHandler to wait for a HTTP request to /callback
         server = HTTPServer(('0.0.0.0', 8100), MyRequestHandler)
-        print('HTTP server listening for requests')
+        print(f'[{current_timestamp()}] HTTP server listening for requests')
         server.serve_forever()
 
         if code != None:
             access_token = auth_manager.get_access_token(code=code, as_dict=False)
             return spotipy.Spotify(auth=access_token)
     else:
-        print("Authenticated.")
+        print(f'[{current_timestamp()}] Authenticated.')
         return spotipy.Spotify(auth_manager=auth_manager)
     return None
