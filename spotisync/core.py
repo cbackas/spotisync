@@ -1,10 +1,7 @@
 import time
-from datetime import datetime
+from utils import current_timestamp
 from auth import authenticate
 from spotify import perform_sync
-
-def current_timestamp():
-    return datetime.now().strftime("%Y/%m/%d %H:%M:%S")
 
 sync_interval = 2.5 # minutes
 sp = None

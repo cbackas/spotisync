@@ -1,6 +1,6 @@
 import threading, os
 from http.server import HTTPServer, SimpleHTTPRequestHandler
-from core import current_timestamp
+from utils import current_timestamp
 import spotipy
 
 code = None

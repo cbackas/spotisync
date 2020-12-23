@@ -1,4 +1,4 @@
-from core import current_timestamp
+from utils import current_timestamp
 from requests import RequestException
 from spotipy.exceptions import SpotifyException
 
