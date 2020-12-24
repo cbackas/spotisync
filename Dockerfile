@@ -1,5 +1,9 @@
 FROM python:3-alpine
 
+RUN apk add tzdata
+
+ENV TZ='America/Chicago'
+
 ADD ./spotisync spotisync/
 RUN pip install spotipy
 
