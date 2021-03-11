@@ -1,5 +1,5 @@
 import time
-from utils import current_timestamp
+from utils import log
 from auth import authenticate
 from spotify import perform_sync
 
@@ -14,4 +14,4 @@ while sp == None: # auth loop
             perform_sync(sp)
             time.sleep(sync_interval * 60)
     else:
-        print(f'[{current_timestamp()}] Not authenticated. Starting auth loop again.')
+        log(f'Not authenticated. Starting auth loop again.')

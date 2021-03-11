@@ -1,4 +1,4 @@
-from utils import current_timestamp
+from utils import log, log_error
 from requests import RequestException
 from spotipy.exceptions import SpotifyException
 
@@ -13,10 +13,10 @@ def get_playlist_tracks(sp, playlist_id: str):
             tracks.extend(results['items'])
         return tracks
     except RequestException as e:
-        print(f'[{current_timestamp()}] [ERROR] Caught exception while getting playlist tracks: {e}')
+        log_error(f'Caught exception while getting playlist tracks: {e}')
         return None
     except SpotifyException as e:
-        print(f'[{current_timestamp()}] [ERROR] Caught exception while getting playlist tracks: {e}')
+        log_error(f'Caught exception while getting playlist tracks: {e}')
         return None
 
 # sync the playlists
@@ -37,8 +37,8 @@ def perform_sync(sp):
             try:
                 sp.playlist_add_items(playlist_id='3KAGyeFZK1uDfet9hOd6gU', items=list(unsynced_tracks.keys()))
 
-                print(f'[{current_timestamp()}] Synced tracks: {list(unsynced_tracks.values())}')
+                log(f'Synced tracks: {list(unsynced_tracks.values())}')
             except RequestException as e:
-                print(f'[{current_timestamp()}] [ERROR] Caught exception while syncing tracks: {e}')
+                log_error(f'Caught exception while syncing tracks: {e}')
             except SpotifyException as e:
-                print(f'[{current_timestamp()}] [ERROR] Caught exception while syncing tracks: {e}')
+                log_error(f'Caught exception while syncing tracks: {e}')
