@@ -1,4 +1,4 @@
-from utils import log, log_error
+from utils import log, log_error, current_timestamp
 from requests import RequestException
 from spotipy.exceptions import SpotifyException
 
@@ -12,16 +12,13 @@ def get_playlist_tracks(sp, playlist_id: str):
             results = sp.next(results)
             tracks.extend(results['items'])
         return tracks
-    except RequestException as e:
-        log_error(f'Caught exception while getting playlist tracks: {e}')
-        return None
-    except SpotifyException as e:
-        log_error(f'Caught exception while getting playlist tracks: {e}')
-        return None
+    except (RequestException, SpotifyException) as error:
+        log_error(f'Caught exception while getting playlist tracks: {error}')
+    return None
 
 # sync the playlists
 def perform_sync(sp):
-    # print(f'[{current_time()}] Checking playlists for differences...')
+    print(f'[{current_timestamp()}] Checking playlists for differences...')
 
     items_jam = get_playlist_tracks(sp, '3KAGyeFZK1uDfet9hOd6gU')
     items_jelly = get_playlist_tracks(sp, '6cHhVGOS9UBamBzw53SQZL')
@@ -38,7 +35,5 @@ def perform_sync(sp):
                 sp.playlist_add_items(playlist_id='3KAGyeFZK1uDfet9hOd6gU', items=list(unsynced_tracks.keys()))
 
                 log(f'Synced tracks: {list(unsynced_tracks.values())}')
-            except RequestException as e:
-                log_error(f'Caught exception while syncing tracks: {e}')
-            except SpotifyException as e:
-                log_error(f'Caught exception while syncing tracks: {e}')
+            except (RequestException, SpotifyException) as error:
+                log_error(f'Caught exception while syncing tracks: {error}')
