@@ -21,12 +21,12 @@ pub async fn one_way_sync(
         .playlist_items(source_playlist_id, None, None)
         .try_collect()
         .await
-        .unwrap();
+        .expect("Error fetching source playlist");
     let target_playlist: Vec<PlaylistItem> = spotify
         .playlist_items(target_playlist_id.as_ref(), None, None)
         .try_collect()
         .await
-        .unwrap();
+        .expect("Error fetching target playlist");
 
     // determine the tracks that are in the source playlist but not in the target playlist
     let unsynced_tracks: Vec<PlayableId> = get_unsynced_tracks(source_playlist, target_playlist)
