@@ -26,23 +26,21 @@ pub async fn one_way_sync(
         .await
         .unwrap();
 
-    let unsynced_tracks: Vec<FullTrack> = get_unsynced_tracks(source_playlist, target_playlist);
-
-    let unsynced_ids: Vec<PlayableId> = unsynced_tracks
+    let unsynced_tracks: Vec<PlayableId> = get_unsynced_tracks(source_playlist, target_playlist)
         .into_iter()
         .map(|track| PlayableId::Track(track.id.unwrap()))
         .collect();
 
-    if unsynced_ids.is_empty() {
+    if unsynced_tracks.is_empty() {
         println!("No tracks to sync");
         return;
     }
 
-    let add_items_result = spotify
-        .playlist_add_items(target_playlist_id, unsynced_ids, None)
+    let sync_result = spotify
+        .playlist_add_items(target_playlist_id, unsynced_tracks, None)
         .await;
 
-    match add_items_result {
+    match sync_result {
         Ok(_) => println!("Successfully synced playlists"),
         Err(e) => println!("Error syncing playlists: {}", e),
     }
