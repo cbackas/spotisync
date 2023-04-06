@@ -1,0 +1,14 @@
+.vscode/
+.cache-*
+__pycache__/
+.DS_Store
+.env
+/cache/
+/images/
+
+# Added by cargo
+
+target/
+.spotify_token_cache.json
+Dockerfile
+.github/
