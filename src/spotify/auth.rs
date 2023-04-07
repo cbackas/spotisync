@@ -106,11 +106,6 @@ lazy_static! {
 // starts up an http server and waits for a callback from spotify
 // returns the entire callback url so we can parse the code/state
 async fn listen_for_callback() -> String {
-    let callback_host: String = match env::var_os("CALLBACK_HOST") {
-        Some(v) => v.into_string().unwrap(),
-        None => "localhost".to_string(),
-    };
-
     let callback_port: u16 = match env::var_os("CALLBACK_PORT") {
         Some(v) => v.into_string().unwrap(),
         None => "8100".to_string(),
@@ -150,8 +145,7 @@ async fn listen_for_callback() -> String {
 
     // add the host and port to the callback url
     // kinda stupid but it lets me use AuthCodeSpotify::parse_response_code()
-    let callback_url: String =
-        callback_host + &":".to_owned() + callback_port.to_string().as_ref() + &callback_url;
+    let callback_url: String = format!("localhost:{}{}", callback_port.to_string(), callback_url);
 
     return callback_url;
 }
