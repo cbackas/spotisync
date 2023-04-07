@@ -8,8 +8,8 @@ use rspotify::{
 // takes in two spotify playlist ids and then syncs any songs that are in the source playlist but not in the target playlist
 pub async fn one_way_sync(
     spotify: AuthCodeSpotify,
-    source_playlist_id: PlaylistId<'_>,
-    target_playlist_id: PlaylistId<'_>,
+    source_playlist_id: &PlaylistId<'_>,
+    target_playlist_id: &PlaylistId<'_>,
 ) {
     // this would be a waste of api calls
     if source_playlist_id == target_playlist_id {
@@ -18,7 +18,7 @@ pub async fn one_way_sync(
 
     // fetch all tracks in both playlists
     let source_playlist: Vec<PlaylistItem> = spotify
-        .playlist_items(source_playlist_id, None, None)
+        .playlist_items(source_playlist_id.as_ref(), None, None)
         .try_collect()
         .await
         .expect("Error fetching source playlist");
@@ -41,7 +41,7 @@ pub async fn one_way_sync(
 
     // have spotify add the new tracks to the target playlist
     let sync_result = spotify
-        .playlist_add_items(target_playlist_id, unsynced_tracks, None)
+        .playlist_add_items(target_playlist_id.as_ref(), unsynced_tracks, None)
         .await;
 
     match sync_result {
