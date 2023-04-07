@@ -85,6 +85,11 @@ pub async fn get_spotify_client() -> AuthCodeSpotify {
                 .request_token(&code)
                 .await
                 .expect("couldn't authenticate successfully");
+
+            // shutdown the callback http server
+            if let Some(tx) = SHUTDOWN_TX.lock().await.take() {
+                let _ = tx.send(());
+            }
         }
     }
 
@@ -150,11 +155,6 @@ async fn listen_for_callback() -> String {
 async fn handle(req: Request<Body>) -> Result<Response<Body>, Infallible> {
     // if callback url send the shutdown signal and the code/state signal
     if req.uri().path() == "/callback" {
-        // call the shutdown signal
-        if let Some(tx) = SHUTDOWN_TX.lock().await.take() {
-            let _ = tx.send(());
-        }
-
         // signal the callback code back to the main thread
         if let Some(tx) = QUERY_TX.lock().await.take() {
             let _ = tx.send(req.uri().to_string());
