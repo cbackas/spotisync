@@ -167,7 +167,7 @@ async fn handle(req: Request<Body>) -> Result<Response<Body>, Infallible> {
 
         // signal the callback code back to the main thread
         if let Some(tx) = QUERY_TX.lock().await.take() {
-            let _ = tx.send("localhost:8100".to_owned() + req.uri().to_string().as_ref());
+            let _ = tx.send(req.uri().to_string());
         }
 
         return Ok(Response::new(Body::from(
