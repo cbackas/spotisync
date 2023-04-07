@@ -126,12 +126,18 @@ async fn listen_for_callback() -> String {
     let make_svc = make_service_fn(|_conn| async { Ok::<_, Infallible>(service_fn(handle)) });
     let addr: SocketAddr = ([0, 0, 0, 0], callback_port).into();
     let server = Server::bind(&addr).serve(make_svc);
+
+    println!("Waiting for Spotify OAuth callback...");
+
     // set the server to shutdown when the shutdown signal is recieved
-    server.with_graceful_shutdown(async {
+    let graceful = server.with_graceful_shutdown(async {
         shutdown_rx.await.ok();
     });
 
-    println!("Waiting for Spotify OAuth callback...");
+    // wait for the server to shutdown before the function will return
+    graceful
+        .await
+        .expect("The callback server didn't shutdown gracefully");
 
     // wait for the callback request to be recieved, expecting the entire URL
     let callback_url: String = query_rx
