@@ -5,7 +5,7 @@ ADD ./Cargo.toml /app/Cargo.toml
 WORKDIR /app
 RUN cargo build --release
 
-FROM rust as run
+FROM rust as runtime
 RUN apt-get update && apt-get install -y cron
 COPY --from=build /app/target/release/spotisync /usr/local/bin/spotisync
 COPY ./entrypoint.sh /usr/local/bin/entrypoint.sh

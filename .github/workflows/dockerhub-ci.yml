@@ -24,6 +24,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
+          target: runtime
           tags: cbackas/spotisync:latest
 
       - uses: actions/checkout@v2
