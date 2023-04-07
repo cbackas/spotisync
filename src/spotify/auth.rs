@@ -40,11 +40,7 @@ pub async fn get_spotify_client() -> AuthCodeSpotify {
     };
 
     let oauth = OAuth {
-        redirect_uri: "http://".to_owned()
-            + &callback_host
-            + &":"
-            + &callback_port
-            + &"/callback".to_owned(),
+        redirect_uri: format!("http://{}:{}/callback", callback_host, callback_port),
         scopes: scopes!(
             "playlist-modify-public",
             "playlist-modify-private",
