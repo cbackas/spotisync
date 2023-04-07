@@ -29,8 +29,22 @@ pub async fn get_spotify_client() -> AuthCodeSpotify {
     let creds: Credentials = Credentials::from_env()
         .expect("Missing RSPOTIFY_CLIENT_ID RSPOTIFY_CLIENT_SECRET env vars");
 
+    let callback_host: String = match env::var_os("CALLBACK_HOST") {
+        Some(v) => v.into_string().unwrap(),
+        None => "localhost".to_string(),
+    };
+
+    let callback_port: String = match env::var_os("CALLBACK_PORT") {
+        Some(v) => v.into_string().unwrap(),
+        None => "8100".to_string(),
+    };
+
     let oauth = OAuth {
-        redirect_uri: "http://localhost:8100/callback".to_string(),
+        redirect_uri: "http://".to_owned()
+            + &callback_host
+            + &":"
+            + &callback_port
+            + &"/callback".to_owned(),
         scopes: scopes!(
             "playlist-modify-public",
             "playlist-modify-private",
@@ -92,7 +106,17 @@ lazy_static! {
 // starts up an http server and waits for a callback from spotify
 // returns the entire callback url so we can parse the code/state
 async fn listen_for_callback() -> String {
-    let server_port: u16 = 8100;
+    let callback_host: String = match env::var_os("CALLBACK_HOST") {
+        Some(v) => v.into_string().unwrap(),
+        None => "localhost".to_string(),
+    };
+
+    let callback_port: u16 = match env::var_os("CALLBACK_PORT") {
+        Some(v) => v.into_string().unwrap(),
+        None => "8100".to_string(),
+    }
+    .parse()
+    .expect("Failed to parse CALLBACK_PORT as u16");
 
     // define a channel to send the shutdown signal to the main thread
     let (shutdown_tx, shutdown_rx) = tokio::sync::oneshot::channel::<()>();
@@ -104,7 +128,7 @@ async fn listen_for_callback() -> String {
 
     // create http server
     let make_svc = make_service_fn(|_conn| async { Ok::<_, Infallible>(service_fn(handle)) });
-    let addr: SocketAddr = ([0, 0, 0, 0], server_port).into();
+    let addr: SocketAddr = ([0, 0, 0, 0], callback_port).into();
     let server = Server::bind(&addr).serve(make_svc);
 
     println!("Waiting for Spotify OAuth callback...");
@@ -127,7 +151,7 @@ async fn listen_for_callback() -> String {
     // add the host and port to the callback url
     // kinda stupid but it lets me use AuthCodeSpotify::parse_response_code()
     let callback_url: String =
-        "localhost:".to_owned() + server_port.to_string().as_ref() + &callback_url;
+        callback_host + &":".to_owned() + callback_port.to_string().as_ref() + &callback_url;
 
     return callback_url;
 }

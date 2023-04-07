@@ -6,12 +6,13 @@ WORKDIR /app
 RUN cargo build --release
 
 FROM rust as runtime
-RUN apt-get update && apt-get install -y cron
 COPY --from=build /app/target/release/spotisync /usr/local/bin/spotisync
 COPY ./entrypoint.sh /usr/local/bin/entrypoint.sh
 
 RUN mkdir -p /app/cache
 ENV RSPOTIFY_CACHE_PATH="/app/cache/.spotify_token_cache.json"
 ENV CONTINUOUS_SYNC="true"
+ENV CALLBACK_HOST="localhost"
+ENV CALLBACK_PORT="8100"
 
 CMD ["/usr/local/bin/entrypoint.sh"]
