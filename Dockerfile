@@ -1,20 +1,17 @@
-FROM python:3-alpine
+FROM rust as build
+ADD ./src /app/src
+ADD ./Cargo.lock /app/Cargo.lock
+ADD ./Cargo.toml /app/Cargo.toml
+WORKDIR /app
+RUN cargo build --release
 
-RUN apk add tzdata
+FROM rust as runtime
+RUN apt-get update && apt-get install -y cron
+COPY --from=build /app/target/release/spotisync /usr/local/bin/spotisync
+COPY ./entrypoint.sh /usr/local/bin/entrypoint.sh
 
-ENV TZ='America/Chicago'
+RUN mkdir -p /app/cache
+ENV RSPOTIFY_CACHE_PATH="/app/cache/.spotify_token_cache.json"
+ENV CONTINUOUS_SYNC="true"
 
-ADD ./spotisync spotisync/
-RUN pip install spotipy
-
-# env variables for spotipy to work
-ENV SPOTIPY_CLIENT_ID=
-ENV SPOTIPY_CLIENT_SECRET=
-ENV SPOTIPY_REDIRECT_URI=
-
-# config folder is where token cache lives
-WORKDIR /
-RUN mkdir config
-
-WORKDIR /spotisync
-CMD [ "python", "-u", "core.py" ]
+CMD ["/usr/local/bin/entrypoint.sh"]

@@ -2,7 +2,7 @@ name: CI to Docker Hub
 
 on:
   push:
-    branches: [master]
+    branches: [main]
 
 jobs:
   docker_build:
@@ -24,7 +24,8 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
-          tags: cbackas/spotisync:latest
+          target: runtime
+          tags: "cbackas/spotisync:latest,cbackas/spotisync:${{ github.sha }}"
 
       - uses: actions/checkout@v2
 
