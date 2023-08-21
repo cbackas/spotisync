@@ -15,4 +15,4 @@ ENV CONTINUOUS_SYNC="true"
 ENV CALLBACK_HOST="localhost"
 ENV CALLBACK_PORT="8100"
 
-CMD ["/usr/local/bin/entrypoint.sh"]
+CMD ["spotisync"]
