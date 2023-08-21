@@ -1,6 +1,7 @@
 use std::env;
 
 use rspotify::model::PlaylistId;
+use tokio::{join, runtime::Builder};
 
 mod spotify;
 
@@ -27,19 +28,29 @@ async fn main() {
         None => false,
     };
 
-    loop {
-        spotify::playlist_sync::one_way_sync(
-            spotify.clone(),
-            &source_playlist_id,
-            &target_playlist_id,
-        )
-        .await;
+    let rt = Builder::new_current_thread().enable_all().build().unwrap();
 
-        if !continous {
-            break;
-        }
+    rt.block_on(async {
+        let playlist_sync_task = async {
+            loop {
+                spotify::playlist_sync::one_way_sync(
+                    spotify.clone(),
+                    &source_playlist_id,
+                    &target_playlist_id,
+                )
+                .await;
 
-        // sleep 40 seconds
-        std::thread::sleep(std::time::Duration::from_secs(40));
-    }
+                if !continous {
+                    break;
+                }
+
+                // sleep 40 seconds
+                std::thread::sleep(std::time::Duration::from_secs(40));
+            }
+        };
+
+        let zspotify_loop = async { /* Task 2 code... */ };
+
+        join!(playlist_sync_task, zspotify_loop);
+    });
 }
