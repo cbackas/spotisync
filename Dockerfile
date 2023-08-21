@@ -7,7 +7,6 @@ RUN cargo build --release
 
 FROM rust as runtime
 COPY --from=build /app/target/release/spotisync /usr/local/bin/spotisync
-COPY ./entrypoint.sh /usr/local/bin/entrypoint.sh
 
 RUN mkdir -p /app/cache
 ENV RSPOTIFY_CACHE_PATH="/app/cache/.spotify_token_cache.json"
