@@ -118,7 +118,7 @@ async fn listen_for_callback() -> String {
     QUERY_TX.lock().await.replace(query_tx);
 
     // create http server
-    let make_svc = make_service_fn(|_conn| async { Ok::<_, Infallible>(service_fn(handle)) });
+    let make_svc = make_service_fn(|_conn| async { Ok::<_, Infallible>(service_fn(hande_requests)) });
     let addr: SocketAddr = ([0, 0, 0, 0], callback_port).into();
     let server = Server::bind(&addr).serve(make_svc);
 
@@ -147,7 +147,7 @@ async fn listen_for_callback() -> String {
 }
 
 // handle all http requests
-async fn handle(req: Request<Body>) -> Result<Response<Body>, Infallible> {
+async fn hande_requests(req: Request<Body>) -> Result<Response<Body>, Infallible> {
     // if callback url send the shutdown signal and the code/state signal
     if req.uri().path() == "/callback" {
         // call the shutdown signal
