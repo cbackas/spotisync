@@ -64,8 +64,14 @@ async fn get_playlist_tracks(
             Err(rspotify::ClientError::Http(http_error)) => match *http_error {
                 HttpError::StatusCode(response) => {
                     if response.status().as_u16() == 429 {
-                        println!("Rate limited, waiting 20 seconds");
-                        std::thread::sleep(std::time::Duration::from_secs(20));
+                        let default_delay = reqwest::header::HeaderValue::from_str("20").unwrap();
+                        let retry_delay = response
+                            .headers()
+                            .get("Retry-After")
+                            .unwrap_or(&default_delay);
+                        let retry_delay = retry_delay.to_str().unwrap().parse::<u64>().unwrap();
+                        println!("Rate limited, waiting {} seconds", retry_delay);
+                        std::thread::sleep(std::time::Duration::from_secs(retry_delay));
                         continue;
                     } else {
                         return Err(anyhow::Error::msg(format!(
