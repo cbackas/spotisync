@@ -1,17 +1,32 @@
+use dotenv::dotenv;
 use std::env;
 
 use rspotify::model::PlaylistId;
 use tokio::{join, runtime::Builder};
+use tracing::{info, warn};
+use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
+
+use crate::spotify::downloader::playlist_album_dump;
 
 mod spotify;
 
 fn main() {
+    dotenv().ok();
+
+    tracing_subscriber::registry()
+        .with(
+            tracing_subscriber::EnvFilter::try_from_default_env()
+                .unwrap_or_else(|_| "spotisync=debug".into()),
+        )
+        .with(tracing_subscriber::fmt::layer())
+        .init();
+
     let rt = Builder::new_current_thread().enable_all().build().unwrap();
 
     rt.block_on(async {
-        let playlist_sync_task = async {
-            let spotify = spotify::auth::get_spotify_client().await;
+        let spotify = spotify::auth::get_spotify_client().await;
 
+        let playlist_sync_task = async {
             let source_playlist_id: String = match env::var_os("SYNC_SOURCE_PLAYLIST_ID") {
                 Some(v) => v.into_string().unwrap(),
                 None => panic!("Missing SYNC_SOURCE_PLAYLIST_ID env var"),
@@ -39,8 +54,33 @@ fn main() {
             }
         };
 
-        let zspotify_loop = async { /* Task 2 code... */ };
+        let download_loop = async {
+            let download_playlist_id: String = match env::var_os("DOWNLAD_PLAYLIST_ID") {
+                Some(v) => v.into_string().unwrap(),
+                None => {
+                    warn!("Missing DOWNLAD_PLAYLIST_ID env var, disabling download loop");
+                    return;
+                }
+            };
+            let download_playlist_id = PlaylistId::from_id_or_uri(&download_playlist_id);
 
-        join!(playlist_sync_task, zspotify_loop);
+            if let Ok(download_playlist_id) = download_playlist_id {
+                info!(
+                    "Starting download loop for playlist {}",
+                    download_playlist_id
+                );
+
+                loop {
+                    playlist_album_dump(spotify.clone(), &download_playlist_id).await;
+
+                    // Sleep 6 hours
+                    std::thread::sleep(std::time::Duration::from_secs(60 * 60 * 6));
+                }
+            } else {
+                warn!("Failed to parse DOWNLAD_PLAYLIST_ID env var, disabling download loop");
+            };
+        };
+
+        join!(playlist_sync_task, download_loop);
     });
 }

@@ -1,0 +1,6 @@
+[submodule "zspotify"]
+	path = zspotify
+	url = https://github.com/jsavargas/zspotify.git
+[submodule "DownOnSpot"]
+	path = DownOnSpot
+	url = https://github.com/oSumAtrIX/DownOnSpot.git

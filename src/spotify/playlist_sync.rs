@@ -1,10 +1,11 @@
-use futures_util::TryStreamExt;
 use rspotify::{
-    http::HttpError,
     model::{FullTrack, PlayableItem, PlaylistId, PlaylistItem},
     prelude::*,
     AuthCodeSpotify,
 };
+use tracing::info;
+
+use crate::spotify::functions::get_playlist_tracks;
 
 // takes in two spotify playlist ids and then syncs any songs that are in the source playlist but not in the target playlist
 pub async fn one_way_sync(
@@ -34,7 +35,7 @@ pub async fn one_way_sync(
         .collect();
 
     if unsynced_tracks.is_empty() {
-        println!("No tracks to sync");
+        info!("No tracks to sync");
         return;
     }
 
@@ -46,54 +47,6 @@ pub async fn one_way_sync(
     match sync_result {
         Ok(_) => println!("Successfully synced playlists"),
         Err(e) => println!("Error syncing playlists: {}", e),
-    }
-}
-
-async fn get_playlist_tracks(
-    spotify: AuthCodeSpotify,
-    playlist_id: &PlaylistId<'_>,
-) -> anyhow::Result<Vec<PlaylistItem>> {
-    loop {
-        let spotify_response = spotify
-            .playlist_items(playlist_id.as_ref(), None, None)
-            .try_collect()
-            .await;
-
-        match spotify_response {
-            Ok(playlist_items) => return Ok(playlist_items),
-            Err(rspotify::ClientError::Http(http_error)) => match *http_error {
-                HttpError::StatusCode(response) => {
-                    if response.status().as_u16() == 429 {
-                        let default_delay = reqwest::header::HeaderValue::from_str("20").unwrap();
-                        let retry_delay = response
-                            .headers()
-                            .get("Retry-After")
-                            .unwrap_or(&default_delay);
-                        let retry_delay = retry_delay.to_str().unwrap().parse::<u64>().unwrap();
-                        println!("Rate limited, waiting {} seconds", retry_delay);
-                        std::thread::sleep(std::time::Duration::from_secs(retry_delay));
-                        continue;
-                    } else {
-                        return Err(anyhow::Error::msg(format!(
-                            "Error getting playlist tracks: {}",
-                            response.status()
-                        )));
-                    }
-                }
-                _ => {
-                    return Err(anyhow::Error::msg(format!(
-                        "Error getting playlist tracks: {}",
-                        http_error.to_string()
-                    )))
-                }
-            },
-            Err(e) => {
-                return Err(anyhow::Error::msg(format!(
-                    "Error getting playlist tracks: {}",
-                    e
-                )))
-            }
-        }
     }
 }
 
