@@ -65,12 +65,14 @@ async fn download_spotify_thing(id: &str, friendly_name: String) {
             tokio::select! {
                 _ = async {
                     while let Some(line) = stdout_reader.next_line().await.unwrap() {
-                        debug!("{}", line);
+                        let cleaned_line = line.replace("\x1B[2J\x1B[1;1H", ""); // Remove the escape codes for clearing the screen
+                        debug!("{}", cleaned_line);
                     }
                 } => {},
                 _ = async {
                     while let Some(line) = stderr_reader.next_line().await.unwrap() {
-                        error!("{}", line);
+                        let cleaned_line = line.replace("\x1B[2J\x1B[1;1H", ""); // Remove the escape codes for clearing the screen
+                        error!("{}", cleaned_line);
                     }
                 } => {},
             }
