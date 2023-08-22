@@ -55,10 +55,10 @@ fn main() {
         };
 
         let download_loop = async {
-            let download_playlist_id: String = match env::var_os("DOWNLAD_PLAYLIST_ID") {
+            let download_playlist_id: String = match env::var_os("DOWNLOAD_PLAYLIST_ID") {
                 Some(v) => v.into_string().unwrap(),
                 None => {
-                    warn!("Missing DOWNLAD_PLAYLIST_ID env var, disabling download loop");
+                    warn!("Missing DOWNLOAD_PLAYLIST_ID env var, disabling download loop");
                     return;
                 }
             };
