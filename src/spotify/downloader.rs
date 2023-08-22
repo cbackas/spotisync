@@ -1,9 +1,10 @@
-use std::process::Command;
-
 use rspotify::{
     model::{PlayableItem, PlaylistId},
+    prelude::Id,
     AuthCodeSpotify,
 };
+use tokio::io::{AsyncBufReadExt, BufReader};
+use tokio::process::Command;
 use tracing::{debug, error, info};
 
 use super::functions::{get_artist_albums, get_playlist_tracks};
@@ -24,8 +25,16 @@ pub async fn playlist_album_dump(spotify: AuthCodeSpotify, playlist_id: &Playlis
                     .await
                     .unwrap_or(Vec::new());
                 for album in albums {
-                    if let Some(href) = album.href {
-                        download_spotify_thing(href, format!("{} - {}", artist.name, album.name));
+                    if let Some(id) = album.id {
+                        download_spotify_thing(
+                            &id.url(),
+                            format!("{} - {}", artist.name, album.name),
+                        )
+                        .await;
+
+                        // sleep for 20 seconds to avoid rate limiting
+                        debug!("Sleeping before next download...");
+                        tokio::time::sleep(tokio::time::Duration::from_secs(20)).await;
                     };
                 }
             }
@@ -33,21 +42,39 @@ pub async fn playlist_album_dump(spotify: AuthCodeSpotify, playlist_id: &Playlis
     }
 }
 
-fn download_spotify_thing(url: String, friendly_name: String) {
-    info!("Starting download of {}", friendly_name);
-    debug!("Downloading Spotify tracks from {}", url);
+async fn download_spotify_thing(id: &str, friendly_name: String) {
+    info!("Starting download of {}...", friendly_name);
+    debug!("Downloading Spotify tracks from {}...", id);
 
     let mut command = Command::new("down_on_spot");
-    command.arg(url);
+    command.arg(id);
+    command.stdout(std::process::Stdio::piped());
+    command.stderr(std::process::Stdio::piped());
 
-    match command.output() {
-        Ok(output) => {
-            let stdout = String::from_utf8_lossy(&output.stdout);
-            let stderr = String::from_utf8_lossy(&output.stderr);
-            debug!("STDOUT: {}", stdout);
-            debug!("STDERR: {}", stderr);
+    match command.spawn() {
+        Ok(mut child) => {
+            let stdout = child.stdout.take().expect("Failed to capture stdout");
+            let stderr = child.stderr.take().expect("Failed to capture stderr");
 
-            if output.status.success() {
+            let mut stdout_reader = BufReader::new(stdout).lines();
+            let mut stderr_reader = BufReader::new(stderr).lines();
+
+            tokio::select! {
+                _ = async {
+                    while let Some(line) = stdout_reader.next_line().await.unwrap() {
+                        debug!("{}", line);
+                    }
+                } => {},
+                _ = async {
+                    while let Some(line) = stderr_reader.next_line().await.unwrap() {
+                        error!("{}", line);
+                    }
+                } => {},
+            }
+
+            let status = child.wait().await.expect("Failed to wait on child");
+
+            if status.success() {
                 info!("Successfully downloaded {}", friendly_name);
             } else {
                 error!("Failed to download {}", friendly_name);

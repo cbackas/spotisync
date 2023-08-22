@@ -9,7 +9,7 @@ edition = "2021"
 rspotify = { version = "0.11.6", features = ['cli', 'env-file'] }
 chrono = "0.4.23"
 futures = { version = "0.3.17", optional = true }
-tokio = { version = "1.26.0", features = ["macros", "rt-multi-thread"] }
+tokio = { version = "1.26.0", features = ["macros", "rt-multi-thread", "process"] }
 futures-util = "0.3.17"
 hyper = { version = "0.14.13", features = ["server"] }
 lazy_static = "1.4.0"
