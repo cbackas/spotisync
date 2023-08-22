@@ -19,6 +19,11 @@ RUN cargo build --release
 FROM rust as runtime
 RUN apt-get update && apt-get install -y libasound2-dev libmp3lame-dev
 
+ENV PGID=99
+ENV GUID=100
+RUN groupmod -o -g "99" users
+RUN usermod -o -u "100" nobody
+
 COPY --from=build_downonspot /app/target/release/down_on_spot /usr/local/bin/down_on_spot
 COPY --from=build /app/target/release/spotisync /usr/local/bin/spotisync
 
