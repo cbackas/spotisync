@@ -35,7 +35,9 @@ pub async fn download_spotify_item(id: &str) {
 
             let status = child.wait().await.expect("Failed to wait on child");
 
-            if !status.success() {
+            if status.success() {
+                debug!("Download finished");
+            } else {
                 error!("Download failed");
             }
         }
