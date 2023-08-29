@@ -3,7 +3,7 @@ use rspotify::{
     prelude::*,
     AuthCodeSpotify,
 };
-use tracing::info;
+use tracing::{error, info};
 
 use crate::spotify::functions::get_playlist_tracks;
 
@@ -45,8 +45,8 @@ pub async fn one_way_sync(
         .await;
 
     match sync_result {
-        Ok(_) => println!("Successfully synced playlists"),
-        Err(e) => println!("Error syncing playlists: {}", e),
+        Ok(_) => info!("Successfully synced tracks to target playlist"),
+        Err(e) => error!("Error syncing playlists: {}", e),
     }
 }
 

@@ -24,9 +24,9 @@ fn main() {
     let rt = Builder::new_current_thread().enable_all().build().unwrap();
 
     rt.block_on(async {
-        let spotify = spotify::auth::get_spotify_client().await;
-
         let playlist_sync_task = async {
+            let spotify = spotify::auth::get_spotify_client().await;
+
             let source_playlist_id: String = match env::var_os("SYNC_SOURCE_PLAYLIST_ID") {
                 Some(v) => v.into_string().unwrap(),
                 None => panic!("Missing SYNC_SOURCE_PLAYLIST_ID env var"),
