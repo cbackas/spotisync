@@ -6,7 +6,7 @@ use tokio::{join, runtime::Builder};
 use tracing::{info, warn};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
-use crate::spotify::downloader::playlist_album_dump;
+use crate::spotify::downloader::download_spotify_item;
 
 mod spotify;
 
@@ -62,23 +62,18 @@ fn main() {
                     return;
                 }
             };
-            let download_playlist_id = PlaylistId::from_id_or_uri(&download_playlist_id);
 
-            if let Ok(download_playlist_id) = download_playlist_id {
-                info!(
-                    "Starting download loop for playlist {}",
-                    download_playlist_id
-                );
+            info!(
+                "Starting download loop for playlist {}",
+                download_playlist_id
+            );
 
-                loop {
-                    playlist_album_dump(spotify.clone(), &download_playlist_id).await;
+            loop {
+                download_spotify_item(&download_playlist_id).await;
 
-                    // Sleep 6 hours
-                    std::thread::sleep(std::time::Duration::from_secs(60 * 60 * 6));
-                }
-            } else {
-                warn!("Failed to parse DOWNLAD_PLAYLIST_ID env var, disabling download loop");
-            };
+                // Sleep 6 hours
+                std::thread::sleep(std::time::Duration::from_secs(60 * 60 * 6));
+            }
         };
 
         join!(playlist_sync_task, download_loop);
