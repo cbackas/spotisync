@@ -121,10 +121,16 @@ pub async fn get_artist_albums(
 ) -> anyhow::Result<Vec<SimplifiedAlbum>> {
     let albums_album =
         get_artist_albums_by_type(spotify.clone(), artist_id.clone(), AlbumType::Album).await?;
-    let albums_singles = get_artist_albums_by_type(spotify, artist_id, AlbumType::Single).await?;
+    let albums_singles =
+        get_artist_albums_by_type(spotify, artist_id.clone(), AlbumType::Single).await?;
+
     let albums = albums_album
         .into_iter()
         .chain(albums_singles.into_iter())
+        .filter(|album| {
+            album.artists.len() == 1 && album.artists[0].id == Some(artist_id.clone_static())
+        })
         .collect::<Vec<SimplifiedAlbum>>();
+
     Ok(albums)
 }
