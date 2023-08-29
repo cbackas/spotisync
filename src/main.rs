@@ -55,25 +55,25 @@ fn main() {
         };
 
         let download_loop = async {
-            let download_playlist_id: String = match env::var_os("DOWNLOAD_PLAYLIST_ID") {
-                Some(v) => v.into_string().unwrap(),
-                None => {
-                    warn!("Missing DOWNLOAD_PLAYLIST_ID env var, disabling download loop");
-                    return;
-                }
-            };
-
-            info!(
-                "Starting download loop for playlist {}",
-                download_playlist_id
-            );
-
-            loop {
-                download_spotify_item(&download_playlist_id).await;
-
-                // Sleep 6 hours
-                std::thread::sleep(std::time::Duration::from_secs(60 * 60 * 6));
-            }
+            // let download_playlist_id: String = match env::var_os("DOWNLOAD_PLAYLIST_ID") {
+            //     Some(v) => v.into_string().unwrap(),
+            //     None => {
+            //         warn!("Missing DOWNLOAD_PLAYLIST_ID env var, disabling download loop");
+            //         return;
+            //     }
+            // };
+            //
+            // info!(
+            //     "Starting download loop for playlist {}",
+            //     download_playlist_id
+            // );
+            //
+            // loop {
+            //     download_spotify_item(&download_playlist_id).await;
+            //
+            //     // Sleep 6 hours
+            //     std::thread::sleep(std::time::Duration::from_secs(60 * 60 * 6));
+            // }
         };
 
         join!(playlist_sync_task, download_loop);

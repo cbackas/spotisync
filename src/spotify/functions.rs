@@ -11,9 +11,14 @@ pub async fn get_playlist_tracks(
     spotify: AuthCodeSpotify,
     playlist_id: &PlaylistId<'_>,
 ) -> anyhow::Result<Vec<PlaylistItem>> {
-    info!("Getting tracks from playlist {}", playlist_id);
-
+    let mut attempt = 0;
     loop {
+        attempt += 1;
+        info!(
+            "Getting tracks from playlist {} (attempt {})",
+            playlist_id, attempt
+        );
+
         let spotify_response = spotify
             .playlist_items(playlist_id.as_ref(), None, None)
             .try_collect()
