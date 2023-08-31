@@ -18,7 +18,6 @@ pub async fn spotify_bulk_download() {
     command.arg("mp3");
 
     command.arg("--skip-downloaded");
-    command.arg("--album-in-filename");
 
     command.arg("--bulk-download");
     command.arg("/root/.zspotify/bulk_download.txt");
