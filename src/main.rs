@@ -1,5 +1,6 @@
 use dotenv::dotenv;
 use std::env;
+use tracing::{debug, error, warn};
 
 use rspotify::model::PlaylistId;
 use tokio::{join, runtime::Builder};
@@ -54,15 +55,36 @@ fn main() {
         };
 
         let download_loop = async {
-            spotify_bulk_download().await;
-            // loop {
-            //     download_spotify_item(&download_playlist_id).await;
-            //
-            //     // Sleep 6 hours
-            //     std::thread::sleep(std::time::Duration::from_secs(60 * 60 * 6));
-            // }
+            loop {
+                spotify_bulk_download().await;
+
+                if let Ok(url) = env::var("PLEX_REFRESH_URL") {
+                    match make_get_request(&url).await {
+                        Ok(_) => debug!("Request successful!"),
+                        Err(err) => error!("Request failed: {}", err),
+                    }
+                } else {
+                    warn!("PLEX_REFRESH_URL environment variable not set.");
+                }
+
+                // Sleep 24 hours
+                std::thread::sleep(std::time::Duration::from_secs(60 * 60 * 24));
+            }
         };
 
         join!(playlist_sync_task, download_loop);
     });
+}
+
+pub async fn make_get_request(url: &str) -> anyhow::Result<()> {
+    let response = reqwest::get(url).await?;
+
+    if response.status().is_success() {
+        anyhow::Ok(())
+    } else {
+        Err(anyhow::anyhow!(
+            "Received a non-successful status code: {}",
+            response.status()
+        ))
+    }
 }
