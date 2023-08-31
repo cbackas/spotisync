@@ -6,8 +6,6 @@ pub async fn spotify_bulk_download() {
     debug!("Starting bulk download of Spotify URLs");
 
     let mut command = Command::new("zspotify");
-    command.arg("--credentials-file");
-    command.arg("/.zspotify/credentials.json");
 
     command.arg("--download-dir");
     command.arg("/downloads/");
