@@ -55,24 +55,7 @@ fn main() {
         };
 
         let download_loop = async {
-            let download_playlist_id: String = match env::var_os("DOWNLOAD_PLAYLIST_ID") {
-                Some(v) => v.into_string().unwrap(),
-                None => {
-                    warn!("Missing DOWNLOAD_PLAYLIST_ID env var, disabling download loop");
-                    return;
-                }
-            };
-
-            info!(
-                "Starting download loop for playlist {}",
-                download_playlist_id
-            );
-
-            download_spotify_item(
-                &download_playlist_id,
-                spotify::downloader::SpotifyItemType::Playlist,
-            )
-            .await;
+            spotify_bulk_download().await;
             // loop {
             //     download_spotify_item(&download_playlist_id).await;
             //

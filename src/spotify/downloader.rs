@@ -2,17 +2,8 @@ use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::process::Command;
 use tracing::{debug, error};
 
-pub enum SpotifyItemType {
-    Playlist,
-    Track,
-    Album,
-    Artist,
-    Episode,
-    FullShow,
-}
-
-pub async fn download_spotify_item(id: &str, item_type: SpotifyItemType) {
-    debug!("Downloading Spotify tracks from {}...", id);
+pub async fn spotify_bulk_download() {
+    debug!("Starting bulk download of Spotify URLs");
 
     let mut command = Command::new("zspotify");
 
@@ -29,27 +20,8 @@ pub async fn download_spotify_item(id: &str, item_type: SpotifyItemType) {
     command.arg("--skip-downloaded");
     command.arg("--album-in-filename");
 
-    match item_type {
-        SpotifyItemType::Playlist => {
-            command.arg("--playlist");
-        }
-        SpotifyItemType::Track => {
-            command.arg("--track");
-        }
-        SpotifyItemType::Album => {
-            command.arg("--album");
-        }
-        SpotifyItemType::Artist => {
-            command.arg("--artist");
-        }
-        SpotifyItemType::Episode => {
-            command.arg("--episode");
-        }
-        SpotifyItemType::FullShow => {
-            command.arg("--full-show");
-        }
-    }
-    command.arg(id);
+    command.arg("--bulk-download");
+    command.arg("/root/zspotify/bulk_download.txt");
 
     command.stdout(std::process::Stdio::piped());
     command.stderr(std::process::Stdio::piped());
@@ -80,9 +52,9 @@ pub async fn download_spotify_item(id: &str, item_type: SpotifyItemType) {
             let status = child.wait().await.expect("Failed to wait on child");
 
             if status.success() {
-                debug!("Download finished");
+                debug!("Bulk download finished");
             } else {
-                error!("Download failed");
+                error!("Bulk download failed");
             }
         }
         Err(error) => {
