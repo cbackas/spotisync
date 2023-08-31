@@ -23,7 +23,7 @@ RUN cargo build --release
 FROM rust as runtime
 COPY --from=build /app/target/release/spotisync /usr/local/bin/spotisync
 
-RUN apt-get update && apt-get install -y python3-pip
+RUN apt-get update && apt-get install -y python3-pip ffmpeg
 RUN pip install --break-system-package git+https://github.com/jsavargas/zspotify
 
 RUN mkdir -p /app/cache
