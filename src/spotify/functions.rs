@@ -36,7 +36,7 @@ pub async fn get_playlist_tracks(
                             .unwrap_or(&default_delay);
                         let retry_delay = retry_delay.to_str().unwrap().parse::<u64>().unwrap();
                         warn!("Rate limited, waiting {} seconds", retry_delay);
-                        std::thread::sleep(std::time::Duration::from_secs(retry_delay));
+                        tokio::time::sleep(tokio::time::Duration::from_secs(retry_delay)).await;
                         continue;
                     } else {
                         return Err(anyhow::Error::msg(format!(

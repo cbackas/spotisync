@@ -50,7 +50,7 @@ fn main() {
                 .await;
 
                 // sleep 40 seconds
-                std::thread::sleep(std::time::Duration::from_secs(40));
+                tokio::time::sleep(tokio::time::Duration::from_secs(40)).await;
             }
         };
 
@@ -68,7 +68,7 @@ fn main() {
                 }
 
                 // Sleep 24 hours
-                std::thread::sleep(std::time::Duration::from_secs(60 * 60 * 24));
+                tokio::time::sleep(tokio::time::Duration::from_secs(60 * 60 * 24)).await;
             }
         };
 
