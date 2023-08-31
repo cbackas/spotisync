@@ -3,10 +3,9 @@ use std::env;
 
 use rspotify::model::PlaylistId;
 use tokio::{join, runtime::Builder};
-use tracing::{info, warn};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
-use crate::spotify::downloader::download_spotify_item;
+use crate::spotify::downloader::spotify_bulk_download;
 
 mod spotify;
 
