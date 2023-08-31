@@ -5,7 +5,15 @@ use tracing::{debug, error};
 pub async fn download_spotify_item(id: &str) {
     debug!("Downloading Spotify tracks from {}...", id);
 
-    let mut command = Command::new("down_on_spot");
+    let mut command = Command::new("zspotify");
+    command.arg("--config-dir");
+    command.arg("/zspotify/config/");
+    command.arg("--credentials-file");
+    command.arg("/zspotify/credentials.json");
+    command.arg("--download-dir");
+    command.arg("/downloads/");
+    command.arg("--music-dir");
+    command.arg("/music/");
     command.arg(id);
     command.stdout(std::process::Stdio::piped());
     command.stderr(std::process::Stdio::piped());
