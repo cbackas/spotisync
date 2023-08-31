@@ -68,7 +68,11 @@ fn main() {
                 download_playlist_id
             );
 
-            download_spotify_item(&download_playlist_id).await;
+            download_spotify_item(
+                &download_playlist_id,
+                spotify::downloader::SpotifyItemType::Playlist,
+            )
+            .await;
             // loop {
             //     download_spotify_item(&download_playlist_id).await;
             //

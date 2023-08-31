@@ -2,7 +2,16 @@ use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::process::Command;
 use tracing::{debug, error};
 
-pub async fn download_spotify_item(id: &str) {
+pub enum SpotifyItemType {
+    Playlist,
+    Track,
+    Album,
+    Artist,
+    Episode,
+    FullShow,
+}
+
+pub async fn download_spotify_item(id: &str, item_type: SpotifyItemType) {
     debug!("Downloading Spotify tracks from {}...", id);
 
     let mut command = Command::new("zspotify");
@@ -14,6 +23,30 @@ pub async fn download_spotify_item(id: &str) {
     command.arg("/downloads/");
     command.arg("--music-dir");
     command.arg("/music/");
+    command.arg("--episodes-dir");
+    command.arg("/episodes/");
+
+    match item_type {
+        SpotifyItemType::Playlist => {
+            command.arg("--playlist");
+        }
+        SpotifyItemType::Track => {
+            command.arg("--track");
+        }
+        SpotifyItemType::Album => {
+            command.arg("--album");
+        }
+        SpotifyItemType::Artist => {
+            command.arg("--artist");
+        }
+        SpotifyItemType::Episode => {
+            command.arg("--episode");
+        }
+        SpotifyItemType::FullShow => {
+            command.arg("--full-show");
+        }
+    }
+
     command.arg(id);
     command.stdout(std::process::Stdio::piped());
     command.stderr(std::process::Stdio::piped());
