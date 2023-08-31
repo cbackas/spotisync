@@ -21,7 +21,7 @@ pub async fn spotify_bulk_download() {
     command.arg("--album-in-filename");
 
     command.arg("--bulk-download");
-    command.arg("/root/zspotify/bulk_download.txt");
+    command.arg("/root/.zspotify/bulk_download.txt");
 
     command.stdout(std::process::Stdio::piped());
     command.stderr(std::process::Stdio::piped());
