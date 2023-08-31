@@ -15,8 +15,6 @@ pub async fn download_spotify_item(id: &str, item_type: SpotifyItemType) {
     debug!("Downloading Spotify tracks from {}...", id);
 
     let mut command = Command::new("zspotify");
-    command.arg("--credentials-file");
-    command.arg("/zspotify/credentials.json");
     command.arg("--download-dir");
     command.arg("/downloads/");
     command.arg("--music-dir");
