@@ -15,12 +15,19 @@ pub async fn download_spotify_item(id: &str, item_type: SpotifyItemType) {
     debug!("Downloading Spotify tracks from {}...", id);
 
     let mut command = Command::new("zspotify");
+
     command.arg("--download-dir");
     command.arg("/downloads/");
     command.arg("--music-dir");
     command.arg("/music/");
     command.arg("--episodes-dir");
     command.arg("/episodes/");
+
+    command.arg("--audio-format");
+    command.arg("mp3");
+
+    command.arg("--skip-downloaded");
+    command.arg("--album-in-filename");
 
     match item_type {
         SpotifyItemType::Playlist => {
@@ -42,8 +49,8 @@ pub async fn download_spotify_item(id: &str, item_type: SpotifyItemType) {
             command.arg("--full-show");
         }
     }
-
     command.arg(id);
+
     command.stdout(std::process::Stdio::piped());
     command.stderr(std::process::Stdio::piped());
 
