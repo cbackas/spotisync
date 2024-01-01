@@ -16,6 +16,4 @@ ENV RSPOTIFY_CACHE_PATH="/app/cache/.spotify_token_cache.json"
 ENV CALLBACK_HOST="localhost"
 ENV CALLBACK_PORT="8100"
 
-USER 99:100
-
 ENTRYPOINT ["spotisync"]
