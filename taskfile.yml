@@ -1,0 +1,20 @@
+version: '3'
+tasks:
+  default:
+    cmds:
+      - task: dev
+  build:
+    cmds:
+      - cargo build
+  run-spotisync:
+    cmds:
+      - cargo run --bin spotisync
+  run-spotidownload:
+    cmds:
+      - cargo run --bin spotidownload
+  dev:
+    aliases: [watch]
+    cmds:
+      - cargo watch -s 'task run-spotidownload'
+    env:
+      RUST_BACKTRACE: 1

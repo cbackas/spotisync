@@ -118,7 +118,8 @@ async fn listen_for_callback() -> String {
     QUERY_TX.lock().await.replace(query_tx);
 
     // create http server
-    let make_svc = make_service_fn(|_conn| async { Ok::<_, Infallible>(service_fn(hande_requests)) });
+    let make_svc =
+        make_service_fn(|_conn| async { Ok::<_, Infallible>(service_fn(hande_requests)) });
     let addr: SocketAddr = ([0, 0, 0, 0], callback_port).into();
     let server = Server::bind(&addr).serve(make_svc);
 

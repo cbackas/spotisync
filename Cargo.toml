@@ -1,20 +1,22 @@
-[package]
-name = "spotisync"
-version = "0.1.0"
-edition = "2021"
+[workspace]
+members = ["spotisync", "spotidownload"]
+resolver = "2"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[dependencies]
-rspotify = { version = "0.11.6", features = ['cli', 'env-file'] }
-chrono = "0.4.23"
-futures = { version = "0.3.17", optional = true }
-tokio = { version = "1.26.0", features = ["macros", "rt-multi-thread", "process"] }
-futures-util = "0.3.17"
-hyper = { version = "0.14.13", features = ["server"] }
-lazy_static = "1.4.0"
-reqwest = "0.11.18"
-anyhow = "1.0.75"
-dotenv = "0.15.0"
-tracing = "0.1.37"
-tracing-subscriber = { version = "0.3.17", features = ["env-filter"] }
+# [dependencies]
+# rspotify = { version = "0.11.6", features = ['cli', 'env-file'] }
+# chrono = "0.4.23"
+# futures = { version = "0.3.17", optional = true }
+# tokio = { version = "1.26.0", features = ["full"] }
+# futures-util = "0.3.17"
+# hyper = { version = "0.14.13", features = ["server"] }
+# lazy_static = "1.4.0"
+# reqwest = "0.11.18"
+# anyhow = "1.0.75"
+# dotenv = "0.15.0"
+# tracing = "0.1.40"
+# tracing-subscriber = { version = "0.3.16", features = ["env-filter"] }
+# axum = { version = "0.7.3", features = ["tracing"] }
+# tower = "0.4.13"
+# tower-http = { version = "0.4.3", features = ["trace"] }
