@@ -18,7 +18,7 @@ ENTRYPOINT ["spotisync"]
 
 FROM rust as spotidownload_runtime
 
-RUN usermod -u 99 -g 100 nobody && chown -R 99:100 /usr/local/bin && chown -R 99:100 /home
+RUN usermod -u 99 -g 100 nobody -d /home && chown -R 99:100 /usr/local/bin && chown -R 99:100 /home
 ENV PIPX_BIN_DIR=/usr/local/bin
 
 COPY --from=build /app/target/release/spotidownload /usr/local/bin/spotidownload
@@ -26,7 +26,6 @@ RUN apt-get update && apt-get install -y ffmpeg pipx && pipx ensurepath
 RUN chmod -R 755 /usr/local/bin
 
 USER nobody
-ENV HOME=/home
 
 RUN pipx install git+https://github.com/jsavargas/zspotify
 
