@@ -17,6 +17,14 @@ ENV CALLBACK_PORT="8100"
 ENTRYPOINT ["spotisync"]
 
 FROM rust as spotidownload_runtime
+
+ARG USER_ID
+ARG GROUP_ID
+
+RUN addgroup --gid $GROUP_ID user
+RUN adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID user
+USER user
+
 COPY --from=build /app/target/release/spotidownload /usr/local/bin/spotidownload
 
 RUN apt-get update && apt-get install -y ffmpeg pipx && pipx ensurepath
