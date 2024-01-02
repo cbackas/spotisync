@@ -20,7 +20,7 @@ FROM rust as spotidownload_runtime
 
 # RUN mkdir /home/zspotify
 # RUN usermod -u 99 -g 100 nobody -d /home/zspotify && chown -R 99:100 /usr/local/bin && chown -R 99:100 /home/zspotify && chmod -R 755 /home/zspotify
-# ENV PIPX_BIN_DIR=/usr/local/bin
+ENV PIPX_BIN_DIR=/usr/local/bin
 
 COPY --from=build /app/target/release/spotidownload /usr/local/bin/spotidownload
 RUN apt-get update && apt-get install -y ffmpeg pipx && pipx ensurepath
