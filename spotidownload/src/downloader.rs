@@ -9,7 +9,7 @@ use tokio::{io::AsyncBufReadExt, io::BufReader, process::Command};
 use tokio_stream::{wrappers::LinesStream, StreamExt};
 use tracing::{debug, error, trace};
 
-#[derive(Deserialize, Debug, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 #[serde(rename_all = "lowercase")]
 pub enum ItemType {
     Album,
@@ -18,7 +18,7 @@ pub enum ItemType {
     Playlist,
 }
 
-#[derive(Deserialize, Debug, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct Item {
     pub id: String,
     pub name: String,
@@ -27,11 +27,15 @@ pub struct Item {
 
 pub struct DownloadQueue {
     queue: Vec<Item>,
+    current: Option<Item>,
 }
 
 impl DownloadQueue {
     pub fn new() -> Self {
-        DownloadQueue { queue: Vec::new() }
+        DownloadQueue {
+            queue: Vec::new(),
+            current: None,
+        }
     }
 
     pub fn add(&mut self, item: Item) {
@@ -48,7 +52,8 @@ impl DownloadQueue {
 
     pub fn next(&mut self) -> Option<Item> {
         if !self.queue.is_empty() {
-            Some(self.queue.remove(0))
+            self.current = Some(self.queue.remove(0));
+            self.current.clone()
         } else {
             None
         }

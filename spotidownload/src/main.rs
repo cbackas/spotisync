@@ -48,9 +48,7 @@ async fn main() {
 fn start_download_loop() {
     tokio::spawn(async move {
         loop {
-            let mut queue = DOWNLOAD_QUEUE.lock().await;
-            let next_item = queue.next();
-            if let Some(item) = next_item {
+            if let Some(item) = DOWNLOAD_QUEUE.lock().await.next() {
                 let result = downloader::download_item(item).await;
                 match result {
                     Ok(output) => {

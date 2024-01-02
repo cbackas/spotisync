@@ -13,10 +13,7 @@ pub async fn post(query: Query<Item>) -> impl IntoResponse {
         false => item.id,
     };
 
-    let mut queue = DOWNLOAD_QUEUE.lock().await;
-    queue.add(item);
-
-    info!("Queue: {:?}", queue);
+    DOWNLOAD_QUEUE.lock().await.add(item);
 
     axum::response::Json("your mother")
 }
