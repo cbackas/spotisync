@@ -103,6 +103,8 @@ pub async fn download_item(item: Item) -> Result<String, Error> {
         .arg("--archive")
         .arg(destinations.archive_file)
         .arg("--audio-format")
+        .arg("--credentials-file")
+        .arg(destinations.credentials_file)
         .arg("mp3")
         .arg("--skip-downloaded")
         .arg(match item.r#type {
