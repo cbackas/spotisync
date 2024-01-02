@@ -10,6 +10,7 @@ use tracing_subscriber::{
 
 mod downloader;
 mod environment;
+mod plex;
 mod routes;
 
 pub type AsyncDownloadQueue = std::sync::Arc<tokio::sync::Mutex<DownloadQueue>>;
@@ -54,6 +55,7 @@ fn start_download_loop() {
                 match result {
                     Ok(output) => {
                         info!("Downloaded item: {:?}", output);
+                        crate::plex::refresh_plex_library().await;
                     }
                     Err(err) => {
                         error!("Failed to download item: {:?}", err);
