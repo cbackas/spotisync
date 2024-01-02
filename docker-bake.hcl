@@ -10,8 +10,8 @@ target "spotisync" {
   inherits = ["common"]
   target = "spotisync_runtime"
   tags = [
-    "ghcr.io/cbackas/spotisync:latest",
-    "ghcr.io/cbackas/spotisync:${VERSION}",
+    "ghcr.io/cbackas/spotisync:sync/latest",
+    "ghcr.io/cbackas/spotisync:sync/${VERSION}",
   ]
 }
 
@@ -19,8 +19,8 @@ target "spotidownload" {
   inherits = ["common"]
   target = "spotidownload_runtime"
   tags = [
-    "ghcr.io/cbackas/spotidownload:latest",
-    "ghcr.io/cbackas/spotidownload:${VERSION}",
+    "ghcr.io/cbackas/spotisync:download/latest",
+    "ghcr.io/cbackas/spotisync:download/${VERSION}",
   ]
 }
 
