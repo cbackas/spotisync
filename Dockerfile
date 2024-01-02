@@ -18,11 +18,8 @@ ENTRYPOINT ["spotisync"]
 
 FROM rust as spotidownload_runtime
 
-ARG USER_ID
-ARG GROUP_ID
-
-RUN addgroup --gid $GROUP_ID user
-RUN adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID user
+RUN addgroup --gid 100 user
+RUN adduser --disabled-password --gecos '' --uid 99 --gid 100 user
 USER user
 
 COPY --from=build /app/target/release/spotidownload /usr/local/bin/spotidownload
