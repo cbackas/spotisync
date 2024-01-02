@@ -20,6 +20,8 @@ FROM rust as spotidownload_runtime
 COPY --from=build /app/target/release/spotidownload /usr/local/bin/spotidownload
 
 RUN apt-get update && apt-get install -y ffmpeg pipx && pipx ensurepath
-RUN pipx install git+https://github.com/jsavargas/zspotify && export PATH=$PATH:/root/.local/bin
+RUN pipx install git+https://github.com/jsavargas/zspotify
+
+ENV PATH="${PATH}:/root/.local/bin"
 
 ENTRYPOINT ["spotidownload"]
