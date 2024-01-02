@@ -27,6 +27,6 @@ RUN chmod -R 755 /usr/local/bin
 
 USER nobody
 
-RUN pipx install git+https://github.com/jsavargas/zspotify
+RUN pipx install git+https://github.com/cbackas/zspotify
 
 ENTRYPOINT ["spotidownload"]
