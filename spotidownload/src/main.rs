@@ -45,10 +45,14 @@ async fn main() {
     axum::serve(listener, router).await.unwrap();
 }
 
+async fn get_next_item() -> Option<downloader::Item> {
+    DOWNLOAD_QUEUE.lock().await.next()
+}
+
 fn start_download_loop() {
     tokio::spawn(async move {
         loop {
-            if let Some(item) = DOWNLOAD_QUEUE.lock().await.next() {
+            if let Some(item) = get_next_item().await {
                 let result = downloader::download_item(item).await;
                 match result {
                     Ok(output) => {
